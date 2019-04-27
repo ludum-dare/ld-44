@@ -1,7 +1,10 @@
+//Thought capital from https://gamedevacademy.org/how-to-make-a-mario-style-platformer-with-phaser-3/
+
 import Phaser from "phaser";
 import logoImg from "./assets/logo.png";
 import testJson from "./assets/test.json";
 import testPng from "./assets/test.png";
+import enemyImg from "./assets/enemy.jpg";
 
 const config = {
   type: Phaser.AUTO,
@@ -10,7 +13,15 @@ const config = {
   height: 600,
   scene: {
     preload: preload,
-    create: create
+    create: create,
+    update: update
+  },
+  physics: { 
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 500 }, // will affect our player sprite
+      debug: false // change if you need
+    }
   }
 };
 
@@ -22,6 +33,7 @@ var tileHeightHalf;
 var d = 0;
 
 var scene;
+var enemy;
 
 function preload() {
   this.load.image("logo", logoImg);
@@ -30,6 +42,7 @@ function preload() {
     frameWidth: 64,
     frameHeight: 64
   });
+  this.load.image('enemy', enemyImg);
 }
 
 function create() {
@@ -38,6 +51,11 @@ function create() {
   this.cameras.main.setSize(1600, 600);
 
   // this.cameras.main.scrollX = 800;
+  // Add the enemy
+  enemy = this.physics.add.sprite(200, 200, 'enemy')
+  enemy.setBounce(0.2)
+  enemy.setCollideWorldBounds(true); // don't go out of the map
+  enemy.depth = 100000;
 }
 
 function buildMap() {
