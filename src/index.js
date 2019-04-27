@@ -5,12 +5,18 @@ import logoImg from "./assets/logo.png";
 import testJson from "./assets/test.json";
 import testPng from "./assets/test.png";
 import enemyImg from "./assets/enemy.jpg";
+import arenaJson from "./assets/arena_data.json";
+import arenaSheet from "./assets/arena_sheet.png";
+import player from "./assets/player.png";
 
 const config = {
   type: Phaser.AUTO,
   parent: "phaser-example",
   width: 800,
   height: 600,
+  physics: {
+    default: "arcade"
+  },
   scene: {
     preload: preload,
     create: create,
@@ -30,15 +36,18 @@ const game = new Phaser.Game(config);
 var tileWidthHalf;
 var tileHeightHalf;
 
-var d = 0;
-
 var scene;
 var enemy;
+var character;
+var cursors;
+var wasd;
 
 function preload() {
   this.load.image("logo", logoImg);
-  this.load.json("map", testJson);
-  this.load.spritesheet("tiles", testPng, {
+
+  this.load.json("map", arenaJson);
+  this.load.image("player", player);
+  this.load.spritesheet("arena", arenaSheet, {
     frameWidth: 64,
     frameHeight: 64
   });
@@ -47,8 +56,18 @@ function preload() {
 
 function create() {
   scene = this;
+  // this.cameras.main.setBounds(0, 0, 3392, 100);
+  // this.physics.world.setBounds(0, 0, 3392, 240);
+
   buildMap();
-  this.cameras.main.setSize(1600, 600);
+  character = this.physics.add
+    .image(400, 100, "player")
+    .setCollideWorldBounds(true);
+  character.depth = 1000;
+  cursors = this.input.keyboard.createCursorKeys();
+  wasd = this.input.keyboard.addKeys("W,A,S,D");
+  this.cameras.main.startFollow(character, true, 0.08, 0.08);
+  this.cameras.main.setZoom(3);
 
   // this.cameras.main.scrollX = 800;
   // Add the enemy
@@ -88,15 +107,32 @@ function buildMap() {
   for (var y = 0; y < mapData.mapHeight; y++) {
     for (var x = 0; x < mapData.mapWidth; x++) {
       var id = mapData.layer[i] - 1;
+  var tilewidth = data.tile_width;
+  var tileheight = data.tile_height;
 
-      var tx = (x - y) * tileWidthHalf;
-      var ty = (x + y) * tileHeightHalf;
+  var layer = data.layers[0].data;
+
+  var mapwidth = data.width;
+  var mapheight = data.height;
+
+  var centerX = mapwidth * (tilewidth / 2);
+  var centerY = 16;
+
+  for (var y = 0; y < mapheight; y++) {
+    for (var x = 0; x < mapwidth; x++) {
+      var id = layer[x][y];
+
+      var tx = (x - y) * (tilewidth / 2);
+      var ty = (x + y) * (tileheight / 4);
 
       var tile = scene.add.image(mapData.centerX + tx, mapData.centerY + ty, "tiles", id);
 
       tile.depth = mapData.centerY + ty;
 
       i++;
+      var tile = scene.add.image(centerX + tx, centerY + ty, "arena", id);
+
+      tile.depth = centerY + ty;
     }
   }
 }
@@ -106,16 +142,22 @@ function update() {
   enemy.setVelocity(0)
   if (d) {
     this.cameras.main.scrollX -= 0.5;
+  }
+  character.setVelocity(0);
+  if (wasd.A.isDown) {
+    character.setVelocityX(-200);
+  } else if (wasd.D.isDown) {
+    character.setVelocityX(200);
+  }
 
-    if (this.cameras.main.scrollX <= 0) {
-      d = 0;
-    }
-  } else {
-    this.cameras.main.scrollX += 0.5;
-
-    if (this.cameras.main.scrollX >= 800) {
-      d = 1;
-    }
+  if (wasd.W.isDown) {
+    wasd.A.isDown || wasd.D.isDown
+      ? character.setVelocityY(-100)
+      : character.setVelocityY(-200);
+  } else if (wasd.S.isDown) {
+    wasd.A.isDown || wasd.D.isDown
+      ? character.setVelocityY(100)
+      : character.setVelocityY(200);
   }
   var enemyX = -100
   
