@@ -47,7 +47,7 @@ function create() {
 
   buildMap();
   character = this.physics.add
-    .image(400, 100, "player")
+    .image(800, 300, "player")
     .setCollideWorldBounds(true);
   character.depth = 1000;
   cursors = this.input.keyboard.createCursorKeys();
