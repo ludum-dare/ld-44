@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import logoImg from "./assets/logo.png";
-import testJson from "./assets/test.json";
-import testPng from "./assets/test.png";
+import arenaJson from "./assets/arena_data.json";
+import arenaSheet from "./assets/arena_sheet.png";
 
 const config = {
   type: Phaser.AUTO,
@@ -25,8 +25,8 @@ var scene;
 
 function preload() {
   this.load.image("logo", logoImg);
-  this.load.json("map", testJson);
-  this.load.spritesheet("tiles", testPng, {
+  this.load.json("map", arenaJson);
+  this.load.spritesheet("arena", arenaSheet, {
     frameWidth: 64,
     frameHeight: 64
   });
@@ -67,7 +67,7 @@ function buildMap() {
       var tx = (x - y) * tileWidthHalf;
       var ty = (x + y) * tileHeightHalf;
 
-      var tile = scene.add.image(centerX + tx, centerY + ty, "tiles", id);
+      var tile = scene.add.image(centerX + tx, centerY + ty, "arena", id);
 
       tile.depth = centerY + ty;
 
