@@ -27,13 +27,14 @@ var tileHeightHalf;
 var scene;
 var character;
 var cursors;
+var wasd;
 
 function preload() {
   this.load.image("logo", logoImg);
 
   this.load.json("map", arenaJson);
   this.load.image("ship", ship);
-  this.load.spritesheet("arema", arenaSheet, {
+  this.load.spritesheet("arena", arenaSheet, {
     frameWidth: 64,
     frameHeight: 64
   });
@@ -51,6 +52,7 @@ function create() {
     .setCollideWorldBounds(true);
   character.depth = 1000;
   cursors = this.input.keyboard.createCursorKeys();
+  wasd = this.input.keyboard.addKeys("W,A,S,D");
   this.cameras.main.startFollow(character, true, 0.08, 0.08);
   this.cameras.main.setZoom(3);
 
@@ -89,19 +91,19 @@ function buildMap() {
 function update() {
   character.setVelocity(0);
 
-  if (cursors.left.isDown) {
-    character.setAngle(-90).setVelocityX(-200);
-    character.setVelocityY(-100);
-  } else if (cursors.right.isDown) {
-    character.setAngle(90).setVelocityX(200);
-    character.setVelocityY(100);
+  if (wasd.A.isDown) {
+    character.setVelocityX(-200);
+  } else if (wasd.D.isDown) {
+    character.setVelocityX(200);
   }
 
-  if (cursors.up.isDown) {
-    character.setAngle(0).setVelocityX(200);
-    character.setVelocityY(-100);
-  } else if (cursors.down.isDown) {
-    character.setAngle(0).setVelocityX(-200);
-    character.setVelocityY(100);
+  if (wasd.W.isDown) {
+    wasd.A.isDown || wasd.D.isDown
+      ? character.setVelocityY(-100)
+      : character.setVelocityY(-200);
+  } else if (wasd.S.isDown) {
+    wasd.A.isDown || wasd.D.isDown
+      ? character.setVelocityY(100)
+      : character.setVelocityY(200);
   }
 }
