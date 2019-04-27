@@ -9,6 +9,7 @@ const config = {
   parent: "phaser-example",
   width: 800,
   height: 600,
+  pixelArt: true,
   physics: {
     default: "arcade"
   },
@@ -47,13 +48,13 @@ function create() {
 
   buildMap();
   character = this.physics.add
-    .image(400, 100, "player")
+    .image(800, 300, "player")
     .setCollideWorldBounds(true);
   character.depth = 1000;
   cursors = this.input.keyboard.createCursorKeys();
   wasd = this.input.keyboard.addKeys("W,A,S,D");
   this.cameras.main.startFollow(character, true, 0.08, 0.08);
-  this.cameras.main.setZoom(3);
+  this.cameras.main.setZoom(2);
 
   // this.cameras.main.scrollX = 800;
 }
