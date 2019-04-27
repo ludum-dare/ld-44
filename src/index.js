@@ -44,34 +44,27 @@ function buildMap() {
   //  Parse the data out of the map
   var data = scene.cache.json.get("map");
 
-  var tilewidth = data.tilewidth;
-  var tileheight = data.tileheight;
-
-  tileWidthHalf = tilewidth / 2;
-  tileHeightHalf = tileheight / 2;
+  var tilewidth = data.tile_width;
+  var tileheight = data.tile_height;
 
   var layer = data.layers[0].data;
 
-  var mapwidth = data.layers[0].width;
-  var mapheight = data.layers[0].height;
+  var mapwidth = data.width;
+  var mapheight = data.height;
 
-  var centerX = mapwidth * tileWidthHalf;
+  var centerX = mapwidth * (tilewidth / 2);
   var centerY = 16;
-
-  var i = 0;
 
   for (var y = 0; y < mapheight; y++) {
     for (var x = 0; x < mapwidth; x++) {
-      var id = layer[i] - 1;
+      var id = layer[x][y];
 
-      var tx = (x - y) * tileWidthHalf;
-      var ty = (x + y) * tileHeightHalf;
+      var tx = (x - y) * (tilewidth / 2);
+      var ty = (x + y) * (tileheight / 4);
 
       var tile = scene.add.image(centerX + tx, centerY + ty, "arena", id);
 
       tile.depth = centerY + ty;
-
-      i++;
     }
   }
 }
