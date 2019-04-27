@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import logoImg from "./assets/logo.png";
-import testJson from "./assets/test.json";
-import testPng from "./assets/test.png";
+import arenaJson from "./assets/arena_data.json";
+import arenaSheet from "./assets/arena_sheet.png";
 import ship from "./assets/fmship.png";
 
 const config = {
@@ -30,9 +30,10 @@ var cursors;
 
 function preload() {
   this.load.image("logo", logoImg);
+
+  this.load.json("map", arenaJson);
   this.load.image("ship", ship);
-  this.load.json("map", testJson);
-  this.load.spritesheet("tiles", testPng, {
+  this.load.spritesheet("arema", arenaSheet, {
     frameWidth: 64,
     frameHeight: 64
   });
@@ -60,34 +61,27 @@ function buildMap() {
   //  Parse the data out of the map
   var data = scene.cache.json.get("map");
 
-  var tilewidth = data.tilewidth;
-  var tileheight = data.tileheight;
-
-  tileWidthHalf = tilewidth / 2;
-  tileHeightHalf = tileheight / 2;
+  var tilewidth = data.tile_width;
+  var tileheight = data.tile_height;
 
   var layer = data.layers[0].data;
 
-  var mapwidth = data.layers[0].width;
-  var mapheight = data.layers[0].height;
+  var mapwidth = data.width;
+  var mapheight = data.height;
 
-  var centerX = mapwidth * tileWidthHalf;
+  var centerX = mapwidth * (tilewidth / 2);
   var centerY = 16;
-
-  var i = 0;
 
   for (var y = 0; y < mapheight; y++) {
     for (var x = 0; x < mapwidth; x++) {
-      var id = layer[i] - 1;
+      var id = layer[x][y];
 
-      var tx = (x - y) * tileWidthHalf;
-      var ty = (x + y) * tileHeightHalf;
+      var tx = (x - y) * (tilewidth / 2);
+      var ty = (x + y) * (tileheight / 4);
 
-      var tile = scene.add.image(centerX + tx, centerY + ty, "tiles", id);
+      var tile = scene.add.image(centerX + tx, centerY + ty, "arena", id);
 
       tile.depth = centerY + ty;
-
-      i++;
     }
   }
 }
