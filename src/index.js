@@ -2,15 +2,20 @@ import Phaser from "phaser";
 import logoImg from "./assets/logo.png";
 import arenaJson from "./assets/arena_data.json";
 import arenaSheet from "./assets/arena_sheet.png";
+import ship from "./assets/fmship.png";
 
 const config = {
   type: Phaser.AUTO,
   parent: "phaser-example",
   width: 800,
   height: 600,
+  physics: {
+    default: "arcade"
+  },
   scene: {
     preload: preload,
-    create: create
+    create: create,
+    update: update
   }
 };
 
@@ -19,14 +24,16 @@ const game = new Phaser.Game(config);
 var tileWidthHalf;
 var tileHeightHalf;
 
-var d = 0;
-
 var scene;
+var character;
+var cursors;
 
 function preload() {
   this.load.image("logo", logoImg);
+
   this.load.json("map", arenaJson);
-  this.load.spritesheet("arena", arenaSheet, {
+  this.load.image("ship", ship);
+  this.load.spritesheet("arema", arenaSheet, {
     frameWidth: 64,
     frameHeight: 64
   });
@@ -34,8 +41,18 @@ function preload() {
 
 function create() {
   scene = this;
+  // this.cameras.main.setBounds(0, 0, 3392, 100);
+  // this.physics.world.setBounds(0, 0, 3392, 240);
+
   buildMap();
-  this.cameras.main.setSize(1600, 600);
+  character = this.physics.add
+    .image(400, 100, "ship")
+    .setAngle(90)
+    .setCollideWorldBounds(true);
+  character.depth = 1000;
+  cursors = this.input.keyboard.createCursorKeys();
+  this.cameras.main.startFollow(character, true, 0.08, 0.08);
+  this.cameras.main.setZoom(3);
 
   // this.cameras.main.scrollX = 800;
 }
@@ -70,19 +87,21 @@ function buildMap() {
 }
 
 function update() {
-  // return;
+  character.setVelocity(0);
 
-  if (d) {
-    this.cameras.main.scrollX -= 0.5;
+  if (cursors.left.isDown) {
+    character.setAngle(-90).setVelocityX(-200);
+    character.setVelocityY(-100);
+  } else if (cursors.right.isDown) {
+    character.setAngle(90).setVelocityX(200);
+    character.setVelocityY(100);
+  }
 
-    if (this.cameras.main.scrollX <= 0) {
-      d = 0;
-    }
-  } else {
-    this.cameras.main.scrollX += 0.5;
-
-    if (this.cameras.main.scrollX >= 800) {
-      d = 1;
-    }
+  if (cursors.up.isDown) {
+    character.setAngle(0).setVelocityX(200);
+    character.setVelocityY(-100);
+  } else if (cursors.down.isDown) {
+    character.setAngle(0).setVelocityX(-200);
+    character.setVelocityY(100);
   }
 }
