@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import logoImg from "./assets/logo.png";
 import arenaJson from "./assets/arena_data.json";
 import arenaSheet from "./assets/arena_sheet.png";
-import ship from "./assets/fmship.png";
+import player from "./assets/player.png";
 
 const config = {
   type: Phaser.AUTO,
@@ -33,7 +33,7 @@ function preload() {
   this.load.image("logo", logoImg);
 
   this.load.json("map", arenaJson);
-  this.load.image("ship", ship);
+  this.load.image("player", player);
   this.load.spritesheet("arena", arenaSheet, {
     frameWidth: 64,
     frameHeight: 64
@@ -47,8 +47,7 @@ function create() {
 
   buildMap();
   character = this.physics.add
-    .image(400, 100, "ship")
-    .setAngle(90)
+    .image(400, 100, "player")
     .setCollideWorldBounds(true);
   character.depth = 1000;
   cursors = this.input.keyboard.createCursorKeys();
