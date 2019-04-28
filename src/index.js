@@ -66,7 +66,7 @@ function create() {
   this.isoPhysics.projector.origin.setTo(0.5, 0.3);
 
   buildMap();
-  character = this.add.isoSprite(0, 0, 0, "player", this.isoGroup);
+  character = this.add.isoSprite(0, 0, 2, "player", this.isoGroup);
 
   this.isoPhysics.world.enable(character);
   character.body.collideWorldBounds = true;
@@ -119,7 +119,7 @@ function buildMap() {
 
       var tx = x * mapData.tileWidth;
       var ty = y * mapData.tileHeight;
-      var tile = scene.add.isoSprite(tx, ty, 0, "arena");
+      var tile = scene.add.isoSprite(tx, ty, -4, "arena");
       tile.setFrame(id)
     }
   }
