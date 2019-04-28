@@ -3,11 +3,12 @@
 import Phaser from "phaser";
 import IsoPlugin, { IsoPhysics } from "phaser3-plugin-isometric";
 import logoImg from "./assets/logo.png";
-import enemyImg from "./assets/enemy.jpg";
+import enemyOne from "./assets/enemy1.png";
 import arenaJson from "./assets/arena_data.json";
 import arenaSheet from "./assets/arena_sheet.png";
 import player from "./assets/player.png";
 import songOne from "./assets/song_1.ogg";
+import Hud from "./hud.js"
 
 const config = {
   type: Phaser.AUTO,
@@ -15,12 +16,13 @@ const config = {
   width: 800,
   height: 600,
   pixelArt: true,
-  scene: {
+  scene: [{
     preload: preload,
     create: create,
     update: update,
     mapAdd: { isoPlugin: "iso", isoPhysics: "isoPhysics" }
-  }
+  }, Hud]
+
 };
 
 const game = new Phaser.Game(config);
@@ -45,7 +47,6 @@ function preload() {
   });
 
   this.load.audio("song_1", songOne);
-  this.load.image("enemy", enemyImg);
   this.load.scenePlugin({
     key: "IsoPlugin",
     url: IsoPlugin,
@@ -57,6 +58,9 @@ function preload() {
     url: IsoPhysics,
     sceneKey: "isoPhysics"
   });
+
+  this.load.image('enemy_1', enemyOne);
+
 }
 
 function create() {
@@ -81,7 +85,7 @@ function create() {
 
   // this.cameras.main.scrollX = 800;
   // Add the enemy
-  enemy = this.add.isoSprite(200, 200, 0, "enemy", this.isoGroup);
+  enemy = this.add.isoSprite(200, 200, 0, "enemy_1", this.isoGroup);
   this.isoPhysics.world.enable(enemy);
   enemy.body.collideWorldBounds = true;
 }
