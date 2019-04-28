@@ -154,4 +154,6 @@ function enemyMotion() {
 function update() {
   characterMotion()
   enemyMotion()
+
+  enemy.depth = enemy.y + 1000;
 }
