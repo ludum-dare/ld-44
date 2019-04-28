@@ -144,10 +144,10 @@ function characterMotion() {
 
 function enemyMotion(anEnemy) {
   // If the character is further to the right than the enemy
-  if (character.x > anEnemy.x) {
+  if (character.x > anEnemy.x + 10) { // Offset to prevent jitter
     anEnemy.setVelocityX(75)
   }
-  else if (character.x < anEnemy.x) {
+  else if (character.x < anEnemy.x) { // Offset to prevent jitter
     anEnemy.setVelocityX(-75)
   }
   else {
@@ -167,7 +167,7 @@ function enemyMotion(anEnemy) {
 }
 function update() {
   characterMotion()
-  enemyMotion()
+  enemyMotion(enemy)
 
   enemy.depth = enemy.y + 1000;
   character.depth = character.y + 1000;
