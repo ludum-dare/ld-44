@@ -152,18 +152,6 @@ function enemyMotion() {
   }
 }
 function update() {
-  //enemy.setVelocity(0)
   characterMotion()
   enemyMotion()
-  // var enemyX = -100
-  
-  // if (enemy.x < 100) {
-  //   enemyX = 100
-  // }
-  // if (enemy.x > 1000) {
-  //   enemyX = -100
-  // }
-  // enemy.setAngle(-90).setVelocityX(-200);
-  // enemy.setVelocityY(-100);
-
 }
