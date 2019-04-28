@@ -1,5 +1,8 @@
+//Thought capital from https://gamedevacademy.org/how-to-make-a-mario-style-platformer-with-phaser-3/
+
 import Phaser from "phaser";
 import logoImg from "./assets/logo.png";
+import enemyImg from "./assets/enemy.jpg";
 import arenaJson from "./assets/arena_data.json";
 import arenaSheet from "./assets/arena_sheet.png";
 import player from "./assets/player.png";
@@ -26,6 +29,7 @@ var tileWidthHalf;
 var tileHeightHalf;
 
 var scene;
+var enemy;
 var character;
 var cursors;
 var wasd;
@@ -39,6 +43,7 @@ function preload() {
     frameWidth: 64,
     frameHeight: 64
   });
+  this.load.image('enemy', enemyImg);
 }
 
 function create() {
@@ -57,53 +62,102 @@ function create() {
   this.cameras.main.setZoom(2);
 
   // this.cameras.main.scrollX = 800;
+  // Add the enemy
+  enemy = this.physics.add.sprite(200, 200, 'enemy')
+  enemy.setBounce(0.2)
+  enemy.setVelocityX(100)
+  enemy.setCollideWorldBounds(true); // don't go out of the map
+  enemy.depth = 100000;
+}
+
+/**
+ * Function that returns all the attributes about the map that you could possibly need
+ */
+function getMapInfo() {
+  var data = scene.cache.json.get("map");
+  var mapData = {
+    tileWidth : data.tile_width,
+    tileHeight : data.tile_height,
+    layer : data.layers[0].data,
+    mapWidth : data.width, // Width of the entire map
+    mapHeight : data.height, // Height of the entire map
+    centerX : data.width * data.tile_width / 2,
+    centerY : 16,
+
+  }
+  return mapData
 }
 
 function buildMap() {
   //  Parse the data out of the map
-  var data = scene.cache.json.get("map");
+  var mapData = getMapInfo()
+  //console.log(mapData)
 
-  var tilewidth = data.tile_width;
-  var tileheight = data.tile_height;
+  for (var y = 0; y < mapData.mapHeight; y++) {
+    for (var x = 0; x < mapData.mapWidth; x++) {
+      var id = mapData.layer[x][y];
 
-  var layer = data.layers[0].data;
+      var tx = (x - y) * (mapData.tileWidth / 2);
+      var ty = (x + y) * (mapData.tileHeight / 4);
 
-  var mapwidth = data.width;
-  var mapheight = data.height;
+      var tile = scene.add.image(mapData.centerX + tx, mapData.centerY + ty, "arena", id);
 
-  var centerX = mapwidth * (tilewidth / 2);
-  var centerY = 16;
-
-  for (var y = 0; y < mapheight; y++) {
-    for (var x = 0; x < mapwidth; x++) {
-      var id = layer[x][y];
-
-      var tx = (x - y) * (tilewidth / 2);
-      var ty = (x + y) * (tileheight / 4);
-
-      var tile = scene.add.image(centerX + tx, centerY + ty, "arena", id);
-
-      tile.depth = centerY + ty;
+      tile.depth = mapData.centerY + ty;
     }
   }
 }
 
-function update() {
-  character.setVelocity(0);
-
-  if (wasd.A.isDown) {
+function characterMotion() {
+   // Horizontal motion for player
+   if (wasd.A.isDown) {
     character.setVelocityX(-200);
-  } else if (wasd.D.isDown) {
+  } 
+  else if (wasd.D.isDown) {
     character.setVelocityX(200);
   }
-
+  // Horizontal check for stop
+  if (wasd.A.isUp && wasd.D.isUp) {
+    character.setVelocityX(0)
+  }
+  // Vertical motion for player
   if (wasd.W.isDown) {
     wasd.A.isDown || wasd.D.isDown
       ? character.setVelocityY(-100)
       : character.setVelocityY(-200);
-  } else if (wasd.S.isDown) {
+  }
+  else if (wasd.S.isDown) {
     wasd.A.isDown || wasd.D.isDown
       ? character.setVelocityY(100)
       : character.setVelocityY(200);
   }
+  // Vertical check for stop
+  if (wasd.W.isUp && wasd.S.isUp) {
+    character.setVelocityY(0);
+  }
+}
+
+function enemyMotion() {
+  // enemy.velocity.x
+  if (enemy.x < 100) {
+    enemy.setVelocityX(100) 
+  }
+  if (enemy.x > 1000) {
+    enemy.setVelocityX(-100)
+  }
+}
+function update() {
+  //enemy.setVelocity(0)
+  characterMotion()
+  enemyMotion()
+  // var enemyX = -100
+  
+  // if (enemy.x < 100) {
+  //   enemyX = 100
+  // }
+  // if (enemy.x > 1000) {
+  //   enemyX = -100
+  // }
+  // enemy.setAngle(-90).setVelocityX(-200);
+  // enemy.setVelocityY(-100);
+
 }
