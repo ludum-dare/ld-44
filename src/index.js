@@ -3,6 +3,7 @@ import logoImg from "./assets/logo.png";
 import arenaJson from "./assets/arena_data.json";
 import arenaSheet from "./assets/arena_sheet.png";
 import player from "./assets/player.png";
+import songOne from "./assets/song_1.ogg";
 
 const config = {
   type: Phaser.AUTO,
@@ -39,6 +40,8 @@ function preload() {
     frameWidth: 64,
     frameHeight: 64
   });
+
+  this.load.audio("song_1", songOne);
 }
 
 function create() {
@@ -56,7 +59,9 @@ function create() {
   this.cameras.main.startFollow(character, true, 0.08, 0.08);
   this.cameras.main.setZoom(2);
 
-  // this.cameras.main.scrollX = 800;
+  const musicConf = { loop: true, delay: 0 }
+  var music = this.sound.add("song_1", musicConf);
+  music.play();
 }
 
 function buildMap() {
