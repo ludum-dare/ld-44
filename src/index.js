@@ -2,7 +2,7 @@
 
 import Phaser from "phaser";
 import logoImg from "./assets/logo.png";
-import enemyImg from "./assets/enemy.jpg";
+import enemyOne from "./assets/enemy1.png";
 import arenaJson from "./assets/arena_data.json";
 import arenaSheet from "./assets/arena_sheet.png";
 import player from "./assets/player.png";
@@ -46,7 +46,7 @@ function preload() {
   });
 
   this.load.audio("song_1", songOne);
-  this.load.image('enemy', enemyImg);
+  this.load.image('enemy_1', enemyOne);
 }
 
 function create() {
@@ -70,8 +70,7 @@ function create() {
   
   // this.cameras.main.scrollX = 800;
   // Add the enemy
-  enemy = this.physics.add.sprite(200, 200, 'enemy')
-  enemy.setBounce(0.2)
+  enemy = this.physics.add.sprite(700, 400, 'enemy_1')
   enemy.setVelocityX(100)
   enemy.setCollideWorldBounds(true); // don't go out of the map
   enemy.depth = 100000;
@@ -153,18 +152,9 @@ function enemyMotion() {
   }
 }
 function update() {
-  //enemy.setVelocity(0)
   characterMotion()
   enemyMotion()
-  // var enemyX = -100
-  
-  // if (enemy.x < 100) {
-  //   enemyX = 100
-  // }
-  // if (enemy.x > 1000) {
-  //   enemyX = -100
-  // }
-  // enemy.setAngle(-90).setVelocityX(-200);
-  // enemy.setVelocityY(-100);
 
+  enemy.depth = enemy.y + 1000;
+  character.depth = character.y + 1000;
 }
