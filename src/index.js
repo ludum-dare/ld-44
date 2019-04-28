@@ -1,6 +1,7 @@
 //Thought capital from https://gamedevacademy.org/how-to-make-a-mario-style-platformer-with-phaser-3/
 
 import Phaser from "phaser";
+import IsoPlugin, { IsoPhysics } from "phaser3-plugin-isometric";
 import logoImg from "./assets/logo.png";
 import enemyOne from "./assets/enemy1.png";
 import arenaJson from "./assets/arena_data.json";
@@ -15,17 +16,13 @@ const config = {
   width: 800,
   height: 600,
   pixelArt: true,
-  physics: {
-    default: "arcade"
-  },
-  scene: [
-    {
-      preload: preload,
-      create: create,
-      update: update
-    },
-    Hud
-  ]
+  scene: [{
+    preload: preload,
+    create: create,
+    update: update,
+    mapAdd: { isoPlugin: "iso", isoPhysics: "isoPhysics" }
+  }, Hud]
+
 };
 
 const game = new Phaser.Game(config);
@@ -50,34 +47,47 @@ function preload() {
   });
 
   this.load.audio("song_1", songOne);
+  this.load.scenePlugin({
+    key: "IsoPlugin",
+    url: IsoPlugin,
+    sceneKey: "iso"
+  });
+
+  this.load.scenePlugin({
+    key: "IsoPhysics",
+    url: IsoPhysics,
+    sceneKey: "isoPhysics"
+  });
+
   this.load.image('enemy_1', enemyOne);
+
 }
 
 function create() {
   scene = this;
-  // this.cameras.main.setBounds(0, 0, 3392, 100);
-  // this.physics.world.setBounds(0, 0, 3392, 240);
+
+  this.isoGroup = this.add.group();
+  this.isoPhysics.projector.origin.setTo(0.5, 0.3);
 
   buildMap();
-  character = this.physics.add
-    .image(800, 300, "player")
-    .setCollideWorldBounds(true);
-  character.depth = 1000;
+  character = this.add.isoSprite(0, 0, 2, "player", this.isoGroup);
+
+  this.isoPhysics.world.enable(character);
+  character.body.collideWorldBounds = true;
   cursors = this.input.keyboard.createCursorKeys();
   wasd = this.input.keyboard.addKeys("W,A,S,D");
   this.cameras.main.startFollow(character, true, 0.08, 0.08);
   this.cameras.main.setZoom(2);
 
-  const musicConf = { loop: true, delay: 0 }
+  const musicConf = { loop: true, delay: 0 };
   var music = this.sound.add("song_1", musicConf);
   music.play();
-  
+
   // this.cameras.main.scrollX = 800;
   // Add the enemy
-  enemy = this.physics.add.sprite(700, 400, 'enemy_1')
-  enemy.setVelocityX(100)
-  enemy.setCollideWorldBounds(true); // don't go out of the map
-  enemy.depth = 100000;
+  enemy = this.add.isoSprite(200, 200, 0, "enemy_1", this.isoGroup);
+  this.isoPhysics.world.enable(enemy);
+  enemy.body.collideWorldBounds = true;
 }
 
 /**
@@ -86,79 +96,74 @@ function create() {
 function getMapInfo() {
   var data = scene.cache.json.get("map");
   var mapData = {
-    tileWidth : data.tile_width,
-    tileHeight : data.tile_height,
-    layer : data.layers[0].data,
-    mapWidth : data.width, // Width of the entire map
-    mapHeight : data.height, // Height of the entire map
-    centerX : data.width * data.tile_width / 2,
-    centerY : 16,
-
-  }
-  return mapData
+    tileWidth: data.tile_width,
+    tileHeight: data.tile_height,
+    layer: data.layers[0].data,
+    mapWidth: data.width, // Width of the entire map
+    mapHeight: data.height // Height of the entire map
+  };
+  return mapData;
 }
 
 function buildMap() {
   //  Parse the data out of the map
-  var mapData = getMapInfo()
-  //console.log(mapData)
+  var mapData = getMapInfo();
+  scene.isoPhysics.world.setBounds(
+    0,
+    0,
+    0,
+    mapData.mapHeight * mapData.tileHeight,
+    mapData.mapWidth * mapData.tileWidth,
+    250
+  );
 
-  for (var y = 0; y < mapData.mapHeight; y++) {
-    for (var x = 0; x < mapData.mapWidth; x++) {
+  for (var x = 0; x < mapData.mapHeight; x++) {
+    for (var y = 0; y < mapData.mapWidth; y++) {
       var id = mapData.layer[x][y];
 
-      var tx = (x - y) * (mapData.tileWidth / 2);
-      var ty = (x + y) * (mapData.tileHeight / 4);
-
-      var tile = scene.add.image(mapData.centerX + tx, mapData.centerY + ty, "arena", id);
-
-      tile.depth = mapData.centerY + ty;
+      var tx = x * mapData.tileWidth;
+      var ty = y * mapData.tileHeight;
+      var tile = scene.add.isoSprite(tx, ty, -4, "arena");
+      tile.setFrame(id)
     }
   }
 }
 
 function characterMotion() {
-   // Horizontal motion for player
-   if (wasd.A.isDown) {
-    character.setVelocityX(-200);
-  } 
-  else if (wasd.D.isDown) {
-    character.setVelocityX(200);
+  // Horizontal motion for player
+  if (wasd.A.isDown) {
+    character.body.velocity.x = -200;
+  } else if (wasd.D.isDown) {
+    character.body.velocity.x = 200;
   }
   // Horizontal check for stop
   if (wasd.A.isUp && wasd.D.isUp) {
-    character.setVelocityX(0)
+    character.body.velocity.x = 0;
   }
   // Vertical motion for player
   if (wasd.W.isDown) {
-    wasd.A.isDown || wasd.D.isDown
-      ? character.setVelocityY(-100)
-      : character.setVelocityY(-200);
-  }
-  else if (wasd.S.isDown) {
-    wasd.A.isDown || wasd.D.isDown
-      ? character.setVelocityY(100)
-      : character.setVelocityY(200);
+    character.body.velocity.y = -200;
+  } else if (wasd.S.isDown) {
+    character.body.velocity.y = 200;
   }
   // Vertical check for stop
   if (wasd.W.isUp && wasd.S.isUp) {
-    character.setVelocityY(0);
+    character.body.velocity.y = 0;
   }
 }
 
 function enemyMotion() {
   // enemy.velocity.x
   if (enemy.x < 100) {
-    enemy.setVelocityX(100) 
+    enemy.velocity.x = 100;
   }
   if (enemy.x > 1000) {
-    enemy.setVelocityX(-100)
+    enemy.velocity.x = -100;
   }
 }
 function update() {
-  characterMotion()
-  enemyMotion()
-
-  enemy.depth = enemy.y + 1000;
-  character.depth = character.y + 1000;
+  //enemy.setVelocity(0)
+  this.isoPhysics.world.collide(this.isoGroup);
+  characterMotion();
+  enemyMotion();
 }
