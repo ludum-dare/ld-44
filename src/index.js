@@ -32,9 +32,11 @@ var tileHeightHalf;
 var scene;
 var enemy;
 var enemy2;
+var initialEnemies;
 var character;
 var cursors;
 var wasd;
+const numEnemiesStart = 10;
 
 function preload() {
   this.load.image("logo", logoImg);
@@ -71,14 +73,20 @@ function create() {
   
   // this.cameras.main.scrollX = 800;
   // Add the enemy
-  enemy = this.physics.add.sprite(900, 1000, 'enemy_1')
-  enemy2 = this.physics.add.sprite(700, 400, 'enemy_1')
-  // enemy.setVelocityX(100)
-  enemy.setCollideWorldBounds(true); // don't go out of the map
-  enemy.setBounce(0);
-  enemy2.setCollideWorldBounds(true);
-  enemy2.setBounce(0);
-  enemy.depth = 100000;
+  initialEnemies = []
+  for (var i = 0; i < numEnemiesStart; i++) {
+    var anEnemy = this.physics.add.sprite(i * 100, i * 50, 'enemy_1')
+    anEnemy.setBounce(1);
+    anEnemy.setCollideWorldBounds(true);
+    initialEnemies.push(anEnemy)
+  }
+  // enemy = this.physics.add.sprite(900, 1000, 'enemy_1')
+  // enemy2 = this.physics.add.sprite(700, 400, 'enemy_1')
+  // // enemy.setVelocityX(100)
+  // enemy.setCollideWorldBounds(true); // don't go out of the map
+  // enemy.setBounce(1);
+  // enemy2.setCollideWorldBounds(true);
+  // enemy2.setBounce(1);
 }
 
 /**
@@ -168,15 +176,19 @@ function enemyMotion(anEnemy, allEnemies) {
   else {
     anEnemy.setVelocityY(0)
   }
+  anEnemy.depth = anEnemy.y + 1000;
 }
 function update() {
   characterMotion()
-  enemyMotion(enemy)
-  enemyMotion(enemy2)
-  this.physics.world.collide(enemy, enemy2, function() {
-
+  initialEnemies.forEach(function(anEnemy) {
+    enemyMotion(anEnemy, initialEnemies);
   });
-  enemy.depth = enemy.y + 1000;
-  enemy2.depth =  enemy2.y + 1000;
+  //enemyMotion(enemy)
+  //enemyMotion(enemy2)
+  // this.physics.world.collide(enemy, enemy2, function() {
+
+  // });
+  // 
+  // enemy2.depth =  enemy2.y + 1000;
   character.depth = character.y + 1000;
 }
