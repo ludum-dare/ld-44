@@ -99,13 +99,13 @@ function buildMap() {
   //  Parse the data out of the map
   var mapData = getMapInfo()
   //console.log(mapData)
-
+  var id, tx, ty;
   for (var y = 0; y < mapData.mapHeight; y++) {
     for (var x = 0; x < mapData.mapWidth; x++) {
-      var id = mapData.layer[x][y];
+      id = mapData.layer[x][y];
 
-      var tx = (x - y) * (mapData.tileWidth / 2);
-      var ty = (x + y) * (mapData.tileHeight / 4);
+      tx = (x - y) * (mapData.tileWidth / 2);
+      ty = (x + y) * (mapData.tileHeight / 4);
 
       var tile = scene.add.image(mapData.centerX + tx, mapData.centerY + ty, "arena", id);
 
@@ -143,19 +143,33 @@ function characterMotion() {
   }
 }
 
-function enemyMotion() {
-  // enemy.velocity.x
-  if (enemy.x < 100) {
-    enemy.setVelocityX(100) 
+function enemyMotion(anEnemy) {
+  // If the character is further to the right than the enemy
+  if (character.x > anEnemy.x) {
+    anEnemy.setVelocityX(75)
   }
-  if (enemy.x > 1000) {
-    enemy.setVelocityX(-100)
+  else if (character.x < anEnemy.x) {
+    anEnemy.setVelocityX(-75)
   }
+  else {
+    anEnemy.setVelocityX(0)
+  }
+  // If the character is higher up than the enemy
+  if (character.y > anEnemy.y + 10) { // Offset to prevent jitter
+    anEnemy.setVelocityY(75)
+  }
+  else if (character.y < anEnemy.y - 10) { // Offset to prevent jitter
+    anEnemy.setVelocityY(-75)
+  }
+  else {
+    anEnemy.setVelocityY(0)
+  }
+
 }
 function update() {
   //enemy.setVelocity(0)
   characterMotion()
-  enemyMotion()
+  enemyMotion(enemy)
   // var enemyX = -100
   
   // if (enemy.x < 100) {
