@@ -2,7 +2,7 @@
 
 import Phaser from "phaser";
 import logoImg from "./assets/logo.png";
-import enemyImg from "./assets/enemy.jpg";
+import enemyOne from "./assets/enemy1.png";
 import arenaJson from "./assets/arena_data.json";
 import arenaSheet from "./assets/arena_sheet.png";
 import player from "./assets/player.png";
@@ -46,7 +46,7 @@ function preload() {
   });
 
   this.load.audio("song_1", songOne);
-  this.load.image('enemy', enemyImg);
+  this.load.image('enemy_1', enemyOne);
 }
 
 function create() {
@@ -70,7 +70,7 @@ function create() {
   
   // this.cameras.main.scrollX = 800;
   // Add the enemy
-  enemy = this.physics.add.sprite(200, 200, 'enemy')
+  enemy = this.physics.add.sprite(22, 28, 'enemy_1')
   enemy.setBounce(0.2)
   enemy.setVelocityX(100)
   enemy.setCollideWorldBounds(true); // don't go out of the map
