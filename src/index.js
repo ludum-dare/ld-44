@@ -7,6 +7,7 @@ import arenaJson from "./assets/arena_data.json";
 import arenaSheet from "./assets/arena_sheet.png";
 import player from "./assets/player.png";
 import songOne from "./assets/song_1.ogg";
+import Hud from "./hud.js"
 
 const config = {
   type: Phaser.AUTO,
@@ -17,11 +18,14 @@ const config = {
   physics: {
     default: "arcade"
   },
-  scene: {
-    preload: preload,
-    create: create,
-    update: update
-  }
+  scene: [
+    {
+      preload: preload,
+      create: create,
+      update: update
+    },
+    Hud
+  ]
 };
 
 const game = new Phaser.Game(config);
