@@ -23,11 +23,13 @@ export default class Hud extends Phaser.Scene
 
     create()
     {
-        this.add.image(110, 25, 'healthBg');
-        this.healthBar = this.add.image(10, 25, 'healthBar');
+        this.cameras.main.setZoom(2);
+
+        this.add.image(260, 165, 'healthBg');
+        this.healthBar = this.add.image(210, 165, 'healthBar');
         this.healthBar.displayOriginX = 0;
 
-        this.waveCounter = this.add.text(15, 50, "Wave: " + this.currentWave, { fontFamily: '"Roboto Condensed"' });
+        this.waveCounter = this.add.text(215, 180, "Wave: " + this.currentWave, { fontFamily: '"Roboto Condensed"' });
     }
 
     updateHealth(val)
