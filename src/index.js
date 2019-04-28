@@ -31,6 +31,7 @@ var tileHeightHalf;
 
 var scene;
 var enemy;
+var enemy2;
 var character;
 var cursors;
 var wasd;
@@ -70,9 +71,13 @@ function create() {
   
   // this.cameras.main.scrollX = 800;
   // Add the enemy
-  enemy = this.physics.add.sprite(700, 400, 'enemy_1')
-  enemy.setVelocityX(100)
+  enemy = this.physics.add.sprite(900, 1000, 'enemy_1')
+  enemy2 = this.physics.add.sprite(700, 400, 'enemy_1')
+  // enemy.setVelocityX(100)
   enemy.setCollideWorldBounds(true); // don't go out of the map
+  enemy.setBounce(0);
+  enemy2.setCollideWorldBounds(true);
+  enemy2.setBounce(0);
   enemy.depth = 100000;
 }
 
@@ -142,7 +147,7 @@ function characterMotion() {
   }
 }
 
-function enemyMotion(anEnemy) {
+function enemyMotion(anEnemy, allEnemies) {
   // If the character is further to the right than the enemy
   if (character.x > anEnemy.x + 10) { // Offset to prevent jitter
     anEnemy.setVelocityX(75)
@@ -163,12 +168,15 @@ function enemyMotion(anEnemy) {
   else {
     anEnemy.setVelocityY(0)
   }
-
 }
 function update() {
   characterMotion()
   enemyMotion(enemy)
+  enemyMotion(enemy2)
+  this.physics.world.collide(enemy, enemy2, function() {
 
+  });
   enemy.depth = enemy.y + 1000;
+  enemy2.depth =  enemy2.y + 1000;
   character.depth = character.y + 1000;
 }
