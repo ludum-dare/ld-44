@@ -6,6 +6,7 @@ import enemyImg from "./assets/enemy.jpg";
 import arenaJson from "./assets/arena_data.json";
 import arenaSheet from "./assets/arena_sheet.png";
 import player from "./assets/player.png";
+import songOne from "./assets/song_1.ogg";
 
 const config = {
   type: Phaser.AUTO,
@@ -43,6 +44,8 @@ function preload() {
     frameWidth: 64,
     frameHeight: 64
   });
+
+  this.load.audio("song_1", songOne);
   this.load.image('enemy', enemyImg);
 }
 
@@ -61,6 +64,10 @@ function create() {
   this.cameras.main.startFollow(character, true, 0.08, 0.08);
   this.cameras.main.setZoom(2);
 
+  const musicConf = { loop: true, delay: 0 }
+  var music = this.sound.add("song_1", musicConf);
+  music.play();
+  
   // this.cameras.main.scrollX = 800;
   // Add the enemy
   enemy = this.physics.add.sprite(200, 200, 'enemy')
