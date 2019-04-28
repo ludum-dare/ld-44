@@ -11,6 +11,8 @@ export default class Hud extends Phaser.Scene
         this.healthDisplayWidth = 200;
         this.maxHealth = 100;
         this.currentHealth = 100;
+
+        this.currentWave = 1;
     }
 
     preload()
@@ -24,6 +26,8 @@ export default class Hud extends Phaser.Scene
         this.add.image(110, 25, 'healthBg');
         this.healthBar = this.add.image(10, 25, 'healthBar');
         this.healthBar.displayOriginX = 0;
+
+        this.waveCounter = this.add.text(15, 50, "Wave: " + this.currentWave, { fontFamily: '"Roboto Condensed"' });
     }
 
     updateHealth(val)
@@ -40,5 +44,17 @@ export default class Hud extends Phaser.Scene
             this.healthBar.displayWidth = 0;
         else if (this.healthDisplayWidth < this.healthBar.displayWidth)
             this.healthBar.displayWidth = this.healthDisplayWidth;
+    }
+
+    incrementWave()
+    {
+        ++this.currentWave;
+        this.waveCounter.text = "Wave: " + this.currentWave;
+    }
+
+    resetWave()
+    {
+        this.currentWave = 1;
+        this.waveCounter.text = "Wave: " + this.currentWave;
     }
 }
