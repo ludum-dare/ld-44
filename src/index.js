@@ -71,6 +71,7 @@ function create() {
   // Add the enemy
   enemy = this.physics.add.sprite(200, 200, 'enemy')
   enemy.setBounce(0.2)
+  enemy.setVelocityX(100)
   enemy.setCollideWorldBounds(true); // don't go out of the map
   enemy.depth = 100000;
 }
@@ -112,10 +113,9 @@ function buildMap() {
   }
 }
 
-function update() {
-  enemy.setVelocity(0)
-  // Horizontal motion for player
-  if (wasd.A.isDown) {
+function characterMotion() {
+   // Horizontal motion for player
+   if (wasd.A.isDown) {
     character.setVelocityX(-200);
   } 
   else if (wasd.D.isDown) {
@@ -140,15 +140,30 @@ function update() {
   if (wasd.W.isUp && wasd.S.isUp) {
     character.setVelocityY(0);
   }
-  var enemyX = -100
-  
+}
+
+function enemyMotion() {
+  // enemy.velocity.x
   if (enemy.x < 100) {
-    enemyX = 100
+    enemy.setVelocityX(100) 
   }
   if (enemy.x > 1000) {
-    enemyX = -100
+    enemy.setVelocityX(-100)
   }
-  enemy.setAngle(-90).setVelocityX(-200);
-  enemy.setVelocityY(-100);
+}
+function update() {
+  //enemy.setVelocity(0)
+  characterMotion()
+  enemyMotion()
+  // var enemyX = -100
+  
+  // if (enemy.x < 100) {
+  //   enemyX = 100
+  // }
+  // if (enemy.x > 1000) {
+  //   enemyX = -100
+  // }
+  // enemy.setAngle(-90).setVelocityX(-200);
+  // enemy.setVelocityY(-100);
 
 }
