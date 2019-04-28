@@ -2,8 +2,6 @@
 
 import Phaser from "phaser";
 import logoImg from "./assets/logo.png";
-import testJson from "./assets/test.json";
-import testPng from "./assets/test.png";
 import enemyImg from "./assets/enemy.jpg";
 import arenaJson from "./assets/arena_data.json";
 import arenaSheet from "./assets/arena_sheet.png";
@@ -83,12 +81,12 @@ function create() {
 function getMapInfo() {
   var data = scene.cache.json.get("map");
   var mapData = {
-    tileWidth : data.tilewidth,
-    tileHeight : data.tileheight,
+    tileWidth : data.tile_width,
+    tileHeight : data.tile_height,
     layer : data.layers[0].data,
-    mapWidth : data.layers[0].width, // Width of the entire map
-    mapHeight : data.layers[0].height, // Height of the entire map
-    centerX : data.layers[0].width * data.tilewidth / 2,
+    mapWidth : data.width, // Width of the entire map
+    mapHeight : data.height, // Height of the entire map
+    centerX : data.width * data.tile_width / 2,
     centerY : 16,
 
   }
@@ -99,65 +97,48 @@ function buildMap() {
   //  Parse the data out of the map
   var mapData = getMapInfo()
   //console.log(mapData)
-  tileWidthHalf = mapData.tileWidth / 2;
-  tileHeightHalf = mapData.tileHeight / 2;
-
-  var i = 0;
 
   for (var y = 0; y < mapData.mapHeight; y++) {
     for (var x = 0; x < mapData.mapWidth; x++) {
-      var id = mapData.layer[i] - 1;
-  var tilewidth = data.tile_width;
-  var tileheight = data.tile_height;
+      var id = mapData.layer[x][y];
 
-  var layer = data.layers[0].data;
+      var tx = (x - y) * (mapData.tileWidth / 2);
+      var ty = (x + y) * (mapData.tileHeight / 4);
 
-  var mapwidth = data.width;
-  var mapheight = data.height;
-
-  var centerX = mapwidth * (tilewidth / 2);
-  var centerY = 16;
-
-  for (var y = 0; y < mapheight; y++) {
-    for (var x = 0; x < mapwidth; x++) {
-      var id = layer[x][y];
-
-      var tx = (x - y) * (tilewidth / 2);
-      var ty = (x + y) * (tileheight / 4);
-
-      var tile = scene.add.image(mapData.centerX + tx, mapData.centerY + ty, "tiles", id);
+      var tile = scene.add.image(mapData.centerX + tx, mapData.centerY + ty, "arena", id);
 
       tile.depth = mapData.centerY + ty;
-
-      i++;
-      var tile = scene.add.image(centerX + tx, centerY + ty, "arena", id);
-
-      tile.depth = centerY + ty;
     }
   }
 }
 
 function update() {
-  // return;
   enemy.setVelocity(0)
-  if (d) {
-    this.cameras.main.scrollX -= 0.5;
-  }
-  character.setVelocity(0);
+  // Horizontal motion for player
   if (wasd.A.isDown) {
     character.setVelocityX(-200);
-  } else if (wasd.D.isDown) {
+  } 
+  else if (wasd.D.isDown) {
     character.setVelocityX(200);
   }
-
+  // Horizontal check for stop
+  if (wasd.A.isUp && wasd.D.isUp) {
+    character.setVelocityX(0)
+  }
+  // Vertical motion for player
   if (wasd.W.isDown) {
     wasd.A.isDown || wasd.D.isDown
       ? character.setVelocityY(-100)
       : character.setVelocityY(-200);
-  } else if (wasd.S.isDown) {
+  }
+  else if (wasd.S.isDown) {
     wasd.A.isDown || wasd.D.isDown
       ? character.setVelocityY(100)
       : character.setVelocityY(200);
+  }
+  // Vertical check for stop
+  if (wasd.W.isUp && wasd.S.isUp) {
+    character.setVelocityY(0);
   }
   var enemyX = -100
   
