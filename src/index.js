@@ -71,7 +71,6 @@ function create() {
   // this.cameras.main.scrollX = 800;
   // Add the enemy
   enemy = this.physics.add.sprite(22, 28, 'enemy_1')
-  enemy.setBounce(0.2)
   enemy.setVelocityX(100)
   enemy.setCollideWorldBounds(true); // don't go out of the map
   enemy.depth = 100000;
