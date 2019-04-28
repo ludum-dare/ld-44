@@ -61,7 +61,7 @@ function preload() {
 
 function create() {
   scene = this;
-  
+
   this.isoGroup = this.add.group();
   this.isoPhysics.projector.origin.setTo(0.5, 0.3);
 
@@ -96,7 +96,7 @@ function getMapInfo() {
     tileHeight: data.tile_height,
     layer: data.layers[0].data,
     mapWidth: data.width, // Width of the entire map
-    mapHeight: data.height, // Height of the entire map
+    mapHeight: data.height // Height of the entire map
   };
   return mapData;
 }
@@ -104,16 +104,23 @@ function getMapInfo() {
 function buildMap() {
   //  Parse the data out of the map
   var mapData = getMapInfo();
-  scene.isoPhysics.world.setBounds(0, 0, 0, mapData.mapHeight * mapData.tileHeight, mapData.mapWidth * mapData.tileWidth, 250)
+  scene.isoPhysics.world.setBounds(
+    0,
+    0,
+    0,
+    mapData.mapHeight * mapData.tileHeight,
+    mapData.mapWidth * mapData.tileWidth,
+    250
+  );
 
   for (var x = 0; x < mapData.mapHeight; x++) {
     for (var y = 0; y < mapData.mapWidth; y++) {
       var id = mapData.layer[x][y];
 
-      var tx = x * mapData.tileWidth
-      var ty = y * mapData.tileHeight
-
+      var tx = x * mapData.tileWidth;
+      var ty = y * mapData.tileHeight;
       var tile = scene.add.isoSprite(tx, ty, 0, "arena");
+      tile.setFrame(id)
     }
   }
 }
