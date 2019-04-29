@@ -80,6 +80,18 @@ export default class Hud extends Phaser.Scene
             this.healthBar.displayWidth = this.healthDisplayWidth;
     }
 
+    decrementMaxHealth()
+    {
+        this.maxHealth -= this.maxHealth / 10;
+        if (0 > this.maxHealth)
+            this.maxHealth = 1;
+
+        if (this.maxHealth < this.currentHealth) {
+            this.currentHealth = this.maxHealth;
+            this.healthBar.displayWidth = this.healthDisplayWidth / 2;
+        }
+    }
+
     incrementWave()
     {
         ++this.currentWave;
@@ -119,17 +131,25 @@ export default class Hud extends Phaser.Scene
 
     upgradeSword()
     {
-        ++this.swordLevel;
-        this.swordUpgrade.setVisible(false);
-        this.bloodUpgrade.setVisible(false);
+        if (this.swordUpgrade.visible) {
+            ++this.swordLevel;
+            this.swordUpgrade.setVisible(false);
+            this.bloodUpgrade.setVisible(false);
+
+            this.decrementMaxHealth();
+        }
     }
 
     upgradeBlood()
     {
-        ++this.bloodLevel;
-        this.swordUpgrade.setVisible(false);
-        this.bloodUpgrade.setVisible(false);
+        if (this.bloodUpgrade.visible) {
+            ++this.bloodLevel;
+            this.swordUpgrade.setVisible(false);
+            this.bloodUpgrade.setVisible(false);
 
-        this.bloodDisabled.setVisible(false);
+            this.bloodDisabled.setVisible(false);
+
+            this.decrementMaxHealth();
+        }
     }
 }

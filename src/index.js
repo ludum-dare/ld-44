@@ -93,6 +93,8 @@ function create() {
   this.physics.add.collider(character, bounds)
 
   justShot = false;
+
+  hud.incrementWave();
 }
 
 /**
@@ -194,9 +196,10 @@ function update() {
 
   const fOffset = hud.bloodLevel > 0 ? 2 : 0;
 
-  if (combatKeys.O.isDown)
+  if (combatKeys.O.isDown) {
     character.setFrame(1 + fOffset);
-  else
+    hud.decrementMaxHealth();
+  } else
     character.setFrame(0 + fOffset);
 
   if (hud.bloodLevel > 0 && combatKeys.P.isDown && !justShot) {
