@@ -9,6 +9,8 @@ import player from "./assets/player.png";
 import songOne from "./assets/song_1.ogg";
 import Hud from "./hud.js"
 
+const hud = new Hud();
+
 const config = {
   type: Phaser.AUTO,
   parent: "phaser-example",
@@ -24,7 +26,7 @@ const config = {
       create: create,
       update: update
     },
-    Hud
+    hud
   ]
 };
 
