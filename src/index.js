@@ -7,7 +7,9 @@ import arenaJson from "./assets/arena_data.json";
 import arenaSheet from "./assets/arena_sheet.png";
 import player from "./assets/player.png";
 import songOne from "./assets/song_1.ogg";
-import Hud from "./hud.js"
+import orbImg from "./assets/orb.png";
+import Hud from "./hud.js";
+import BloodOrb from "./blood_orb.js";
 
 const hud = new Hud();
 
@@ -42,12 +44,18 @@ var character;
 var bounds;
 var cursors;
 var wasd;
+var combatKeys;
+var orbs;
+var justShot
 
 function preload() {
   this.load.image("logo", logoImg);
 
   this.load.json("map", arenaJson);
-  this.load.image("player", player);
+  this.load.spritesheet("player", player, {
+    frameWidth: 48,
+    frameHeight: 36
+  });
   this.load.spritesheet("arena", arenaSheet, {
     frameWidth: 64,
     frameHeight: 64
@@ -55,6 +63,7 @@ function preload() {
 
   this.load.audio("song_1", songOne);
   this.load.image("enemy_1", enemyOne);
+  this.load.image("blood_orb", orbImg);
 }
 
 function create() {
@@ -62,11 +71,12 @@ function create() {
   bounds = scene.physics.add.staticGroup();
   buildMap();
   character = this.physics.add
-    .image(800, 300, "player")
+    .image(800, 300, "player", 0)
     .setCollideWorldBounds(true);
   character.depth = 1000;
   cursors = this.input.keyboard.createCursorKeys();
   wasd = this.input.keyboard.addKeys("W,A,S,D");
+  combatKeys = this.input.keyboard.addKeys("O,P");
   this.cameras.main.startFollow(character, true, 0.08, 0.08);
   this.cameras.main.setZoom(2);
 
@@ -81,6 +91,8 @@ function create() {
   enemy.setCollideWorldBounds(true); // don't go out of the map
   enemy.depth = 100000;
   this.physics.add.collider(character, bounds)
+
+  justShot = false;
 }
 
 /**
@@ -172,10 +184,49 @@ function enemyMotion() {
     enemy.setVelocityX(-100);
   }
 }
+
 function update() {
   characterMotion();
   enemyMotion();
 
   enemy.depth = enemy.y + 1000;
   character.depth = character.y + 1000;
+
+  const fOffset = hud.bloodLevel > 0 ? 2 : 0;
+
+  if (combatKeys.O.isDown)
+    character.setFrame(1 + fOffset);
+  else
+    character.setFrame(0 + fOffset);
+
+  if (hud.bloodLevel > 0 && combatKeys.P.isDown && !justShot) {
+    justShot = true;
+
+    var sprite = new BloodOrb(scene, character.x, character.y, "blood_orb", 0);
+    sprite.setActive(true);
+    this.physics.add.collider(sprite, bounds, orbWallCollisionCb);
+
+    var x = 0;
+    if (character.body.velocity.x > 0)
+      x = 100;
+    else if (character.body.velocity.x < 0)
+      x = -100;
+
+    var y = 0;
+    if (character.body.velocity.y > 0)
+      y = 100;
+    else if (character.body.velocity.y < 0)
+      y = -100;
+    
+    if (x == 0 && y == 0)
+      y = 100;
+
+    sprite.body.setVelocity(x, y);
+  } else if (combatKeys.P.isUp) {
+    justShot = false;
+  }
+}
+
+function orbWallCollisionCb(orb, wall) {
+  orb.destroy();  
 }
