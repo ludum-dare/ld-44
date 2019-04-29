@@ -177,6 +177,7 @@ function enemyMotion() {
     enemy.setVelocityX(-100);
   }
 }
+
 function update() {
   characterMotion();
   enemyMotion();
@@ -184,8 +185,10 @@ function update() {
   enemy.depth = enemy.y + 1000;
   character.depth = character.y + 1000;
 
+  const fOffset = hud.bloodLevel > 0 ? 2 : 0;
+
   if (combatKeys.O.isDown)
-    character.setFrame(1);
+    character.setFrame(1 + fOffset);
   else
-    character.setFrame(0);
+    character.setFrame(0 + fOffset);
 }
