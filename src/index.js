@@ -33,6 +33,7 @@ var scene;
 var enemy;
 var enemy2;
 var initialEnemies;
+var enemyGroup;
 var character;
 var cursors;
 var wasd;
@@ -70,7 +71,7 @@ function create() {
   const musicConf = { loop: true, delay: 0 }
   var music = this.sound.add("song_1", musicConf);
   music.play();
-  
+  enemyGroup = this.physics.add.group()
   // this.cameras.main.scrollX = 800;
   // Add the enemy
   initialEnemies = []
@@ -78,8 +79,11 @@ function create() {
     var anEnemy = this.physics.add.sprite(i * 100, i * 50, 'enemy_1')
     anEnemy.setBounce(1);
     anEnemy.setCollideWorldBounds(true);
-    initialEnemies.push(anEnemy)
+    // initialEnemies.push(anEnemy)
+    enemyGroup.add(anEnemy)
   }
+  this.physics.add.collider([enemyGroup], [enemyGroup], enemyCollision(), false, this).name = 'enemyCollider'
+
   // enemy = this.physics.add.sprite(900, 1000, 'enemy_1')
   // enemy2 = this.physics.add.sprite(700, 400, 'enemy_1')
   // // enemy.setVelocityX(100)
@@ -89,6 +93,9 @@ function create() {
   // enemy2.setBounce(1);
 }
 
+function enemyCollision() {
+  console.log("Collision")
+}
 /**
  * Function that returns all the attributes about the map that you could possibly need
  */
@@ -158,13 +165,19 @@ function characterMotion() {
 function enemyMotion(anEnemy, allEnemies) {
   // If the character is further to the right than the enemy
   if (character.x > anEnemy.x + 10) { // Offset to prevent jitter
-    anEnemy.setVelocityX(75)
+    if (anEnemy.body.velocity.x != 75) {
+      anEnemy.setVelocityX(75)
+    }
   }
-  else if (character.x < anEnemy.x) { // Offset to prevent jitter
-    anEnemy.setVelocityX(-75)
+  else if (character.x < anEnemy.x - 10) { // Offset to prevent jitter
+    if (anEnemy.body.velocity.x != -75) {
+      anEnemy.setVelocityX(-75)
+    }
   }
   else {
-    anEnemy.setVelocityX(0)
+    if (anEnemy.body.velocity.x != 0) {
+      anEnemy.setVelocityX(0)
+    }
   }
   // If the character is higher up than the enemy
   if (character.y > anEnemy.y + 10) { // Offset to prevent jitter
@@ -176,11 +189,12 @@ function enemyMotion(anEnemy, allEnemies) {
   else {
     anEnemy.setVelocityY(0)
   }
-  anEnemy.depth = anEnemy.y + 1000;
+  anEnemy.depth = 1000;
+  //allEnemies.forEach(function(anotherEnemy))
 }
 function update() {
   characterMotion()
-  initialEnemies.forEach(function(anEnemy) {
+  enemyGroup.children.entries.forEach(function(anEnemy) {
     enemyMotion(anEnemy, initialEnemies);
   });
   //enemyMotion(enemy)
