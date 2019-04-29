@@ -93,8 +93,6 @@ function create() {
   this.physics.add.collider(character, bounds)
 
   justShot = false;
-
-  hud.incrementWave();
 }
 
 /**
