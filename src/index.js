@@ -42,6 +42,7 @@ var character;
 var bounds;
 var cursors;
 var wasd;
+var combatKeys;
 
 function preload() {
   this.load.image("logo", logoImg);
@@ -70,6 +71,7 @@ function create() {
   character.depth = 1000;
   cursors = this.input.keyboard.createCursorKeys();
   wasd = this.input.keyboard.addKeys("W,A,S,D");
+  combatKeys = this.input.keyboard.addKeys("O,P");
   this.cameras.main.startFollow(character, true, 0.08, 0.08);
   this.cameras.main.setZoom(2);
 
@@ -181,4 +183,9 @@ function update() {
 
   enemy.depth = enemy.y + 1000;
   character.depth = character.y + 1000;
+
+  if (combatKeys.O.isDown)
+    character.setFrame(1);
+  else
+    character.setFrame(0);
 }
