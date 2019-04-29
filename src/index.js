@@ -196,10 +196,9 @@ function update() {
 
   const fOffset = hud.bloodLevel > 0 ? 2 : 0;
 
-  if (combatKeys.O.isDown) {
+  if (combatKeys.O.isDown)
     character.setFrame(1 + fOffset);
-    hud.decrementMaxHealth();
-  } else
+  else
     character.setFrame(0 + fOffset);
 
   if (hud.bloodLevel > 0 && combatKeys.P.isDown && !justShot) {
