@@ -47,7 +47,10 @@ function preload() {
   this.load.image("logo", logoImg);
 
   this.load.json("map", arenaJson);
-  this.load.image("player", player);
+  this.load.spritesheet("player", player, {
+    frameWidth: 48,
+    frameHeight: 36
+  });
   this.load.spritesheet("arena", arenaSheet, {
     frameWidth: 64,
     frameHeight: 64
@@ -62,7 +65,7 @@ function create() {
   bounds = scene.physics.add.staticGroup();
   buildMap();
   character = this.physics.add
-    .image(800, 300, "player")
+    .image(800, 300, "player", 0)
     .setCollideWorldBounds(true);
   character.depth = 1000;
   cursors = this.input.keyboard.createCursorKeys();
