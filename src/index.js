@@ -45,6 +45,7 @@ var character;
 var bounds;
 var cursors;
 var wasd;
+var tick;
 const numEnemiesStart = 10;
 
 function preload() {
@@ -77,19 +78,22 @@ function create() {
   const musicConf = { loop: true, delay: 0 }
   var music = this.sound.add("song_1", musicConf);
   music.play();
-  enemyGroup = this.physics.add.group()
+  enemyGroup = this.physics.add.group({
+    bounceX: 1,
+    bounceY: 1,
+    collideWorldBounds:true
+  })
   // this.cameras.main.scrollX = 800;
   // Add the enemy
   initialEnemies = []
   for (var i = 0; i < numEnemiesStart; i++) {
     var anEnemy = this.physics.add.sprite(i * 100, i * 50, 'enemy_1')
-    anEnemy.setBounce(1);
-    anEnemy.setCollideWorldBounds(true);
+    anEnemy.tick = 0
     // initialEnemies.push(anEnemy)
     enemyGroup.add(anEnemy)
   }
-  this.physics.add.collider([enemyGroup], [enemyGroup], enemyCollision(), false, this).name = 'enemyCollider'
-
+  this.physics.add.collider(enemyGroup, enemyGroup, enemyCollision, null, this).name = 'enemyCollider'
+  this.physics.add.collider(character, enemyGroup, characterCollision, null, this).name = 'characterCollider'
   // enemy = this.physics.add.sprite(900, 1000, 'enemy_1')
   // enemy2 = this.physics.add.sprite(700, 400, 'enemy_1')
   // // enemy.setVelocityX(100)
@@ -101,11 +105,20 @@ function create() {
   // this.cameras.main.scrollX = 800;
   // Add the enemy
   // 
+  tick = 0
   this.physics.add.collider(character, bounds)
+  this.physics.add.collider(enemyGroup, bounds)
 }
 
-function enemyCollision() {
+function enemyCollision(anEnemy, anotherEnemy) {
+  anEnemy.setVelocityX(75)
+  anotherEnemy.setVelocityX(-75)
   console.log("Collision")
+  return
+}
+function characterCollision() {
+  console.log("Character Collision")
+  return
 }
 /**
  * Function that returns all the attributes about the map that you could possibly need
@@ -189,33 +202,39 @@ function characterMotion() {
 
 function enemyMotion(anEnemy, allEnemies) {
   // If the character is further to the right than the enemy
-  if (character.x > anEnemy.x + 10) { // Offset to prevent jitter
-    if (anEnemy.body.velocity.x != 75) {
-      anEnemy.setVelocityX(75)
+  if (anEnemy.tick === 100) {
+    anEnemy.tick = 0
+    if (character.x > anEnemy.x + 10) { // Offset to prevent jitter
+      if (anEnemy.body.velocity.x != 75) {
+        anEnemy.setVelocityX(75)
+      }
     }
-  }
-  else if (character.x < anEnemy.x - 10) { // Offset to prevent jitter
-    if (anEnemy.body.velocity.x != -75) {
-      anEnemy.setVelocityX(-75)
+    else if (character.x < anEnemy.x - 10) { // Offset to prevent jitter
+      if (anEnemy.body.velocity.x != -75) {
+        anEnemy.setVelocityX(-75)
+      }
     }
-  }
-  else {
-    if (anEnemy.body.velocity.x != 0) {
-      anEnemy.setVelocityX(0)
+    else {
+      if (anEnemy.body.velocity.x != 0) {
+        anEnemy.setVelocityX(0)
+      }
     }
+    // If the character is higher up than the enemy
+    if (character.y > anEnemy.y + 10) { // Offset to prevent jitter
+      anEnemy.setVelocityY(75)
+    }
+    else if (character.y < anEnemy.y - 10) { // Offset to prevent jitter
+      anEnemy.setVelocityY(-75)
+    }
+    else {
+      anEnemy.setVelocityY(0)
+    }
+    anEnemy.depth = 1000;
   }
-  // If the character is higher up than the enemy
-  if (character.y > anEnemy.y + 10) { // Offset to prevent jitter
-    anEnemy.setVelocityY(75)
-  }
-  else if (character.y < anEnemy.y - 10) { // Offset to prevent jitter
-    anEnemy.setVelocityY(-75)
-  }
-  else {
-    anEnemy.setVelocityY(0)
-  }
-  anEnemy.depth = 1000;
+  
+  
   //allEnemies.forEach(function(anotherEnemy))
+  anEnemy.tick += 1
 }
 function update() {
   characterMotion()
