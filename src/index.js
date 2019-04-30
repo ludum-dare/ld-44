@@ -40,10 +40,14 @@ var tileHeightHalf;
 
 var scene;
 var enemy;
+var enemy2;
+var initialEnemies;
+var enemyGroup;
 var character;
 var bounds;
 var cursors;
 var wasd;
+const numEnemiesStart = 10;
 var combatKeys;
 var orbs;
 var justShot
@@ -83,18 +87,49 @@ function create() {
   const musicConf = { loop: true, delay: 0 }
   var music = this.sound.add("song_1", musicConf);
   music.play();
+  enemyGroup = this.physics.add.group({
+    bounceX: 1,
+    bounceY: 1,
+    collideWorldBounds:true
+  })
+  // this.cameras.main.scrollX = 800;
+  // Add the enemy
+  initialEnemies = []
+  for (var i = 0; i < numEnemiesStart; i++) {
+    var anEnemy = this.physics.add.sprite(i * 100, i * 50, 'enemy_1')
+    anEnemy.tick = 0
+    // initialEnemies.push(anEnemy)
+    enemyGroup.add(anEnemy)
+  }
+  this.physics.add.collider(enemyGroup, enemyGroup, enemyCollision, null, this).name = 'enemyCollider'
+  this.physics.add.collider(character, enemyGroup, characterCollision, null, this).name = 'characterCollider'
+  // enemy = this.physics.add.sprite(900, 1000, 'enemy_1')
+  // enemy2 = this.physics.add.sprite(700, 400, 'enemy_1')
+  // // enemy.setVelocityX(100)
+  // enemy.setCollideWorldBounds(true); // don't go out of the map
+  // enemy.setBounce(1);
+  // enemy2.setCollideWorldBounds(true);
+  // enemy2.setBounce(1);
 
   // this.cameras.main.scrollX = 800;
   // Add the enemy
-  enemy = this.physics.add.sprite(700, 400, 'enemy_1')
-  enemy.setVelocityX(100)
-  enemy.setCollideWorldBounds(true); // don't go out of the map
-  enemy.depth = 100000;
+  // 
   this.physics.add.collider(character, bounds)
+  this.physics.add.collider(enemyGroup, bounds)
 
   justShot = false;
 }
 
+function enemyCollision(anEnemy, anotherEnemy) {
+  anEnemy.setVelocityX(75)
+  anotherEnemy.setVelocityX(-75)
+  console.log("Collision")
+  return
+}
+function characterCollision() {
+  console.log("Character Collision")
+  return
+}
 /**
  * Function that returns all the attributes about the map that you could possibly need
  */
@@ -116,13 +151,13 @@ function buildMap() {
   //  Parse the data out of the map
   var mapData = getMapInfo()
   //console.log(mapData)
-
+  var id, tx, ty;
   for (var y = 0; y < mapData.mapHeight; y++) {
     for (var x = 0; x < mapData.mapWidth; x++) {
-      var id = mapData.layer[x][y];
+      id = mapData.layer[x][y];
 
-      var tx = (x - y) * (mapData.tileWidth / 2);
-      var ty = (x + y) * (mapData.tileHeight / 4);
+      tx = (x - y) * (mapData.tileWidth / 2);
+      ty = (x + y) * (mapData.tileHeight / 4);
 
       var tile = scene.add.image(mapData.centerX + tx, mapData.centerY + ty, "arena", id);
 
@@ -175,21 +210,55 @@ function characterMotion() {
   }
 }
 
-function enemyMotion() {
-  // enemy.velocity.x
-  if (enemy.x < 100) {
-    enemy.setVelocityX(100);
+function enemyMotion(anEnemy, allEnemies) {
+  // If the character is further to the right than the enemy
+  if (anEnemy.tick === 100) {
+    anEnemy.tick = 0
+    if (character.x > anEnemy.x + 10) { // Offset to prevent jitter
+      if (anEnemy.body.velocity.x != 75) {
+        anEnemy.setVelocityX(75)
+      }
+    }
+    else if (character.x < anEnemy.x - 10) { // Offset to prevent jitter
+      if (anEnemy.body.velocity.x != -75) {
+        anEnemy.setVelocityX(-75)
+      }
+    }
+    else {
+      if (anEnemy.body.velocity.x != 0) {
+        anEnemy.setVelocityX(0)
+      }
+    }
+    // If the character is higher up than the enemy
+    if (character.y > anEnemy.y + 10) { // Offset to prevent jitter
+      anEnemy.setVelocityY(75)
+    }
+    else if (character.y < anEnemy.y - 10) { // Offset to prevent jitter
+      anEnemy.setVelocityY(-75)
+    }
+    else {
+      anEnemy.setVelocityY(0)
+    }
+    anEnemy.depth = 1000;
   }
-  if (enemy.x > 1000) {
-    enemy.setVelocityX(-100);
-  }
+  
+  
+  //allEnemies.forEach(function(anotherEnemy))
+  anEnemy.tick += 1
 }
 
 function update() {
-  characterMotion();
-  enemyMotion();
+  characterMotion()
+  enemyGroup.children.entries.forEach(function(anEnemy) {
+    enemyMotion(anEnemy, initialEnemies);
+  });
+  //enemyMotion(enemy)
+  //enemyMotion(enemy2)
+  // this.physics.world.collide(enemy, enemy2, function() {
 
-  enemy.depth = enemy.y + 1000;
+  // });
+  // 
+  // enemy2.depth =  enemy2.y + 1000;
   character.depth = character.y + 1000;
 
   const fOffset = hud.bloodLevel > 0 ? 2 : 0;
