@@ -127,8 +127,7 @@ function enemyCollision(anEnemy, anotherEnemy) {
   return
 }
 function characterCollision() {
-  console.log("Character Collision")
-  return
+  hud.updateHealth(-1);
 }
 /**
  * Function that returns all the attributes about the map that you could possibly need
