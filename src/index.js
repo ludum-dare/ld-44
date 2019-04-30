@@ -93,6 +93,7 @@ function create() {
   this.physics.add.collider(character, bounds)
 
   justShot = false;
+  hud.incrementWave();
 }
 
 /**
@@ -208,18 +209,18 @@ function update() {
 
     var x = 0;
     if (character.body.velocity.x > 0)
-      x = 100;
+      x = 250;
     else if (character.body.velocity.x < 0)
-      x = -100;
+      x = -250;
 
     var y = 0;
     if (character.body.velocity.y > 0)
-      y = 100;
+      y = 250;
     else if (character.body.velocity.y < 0)
-      y = -100;
+      y = -250;
     
     if (x == 0 && y == 0)
-      y = 100;
+      y = 250;
 
     sprite.body.setVelocity(x, y);
   } else if (combatKeys.P.isUp) {
