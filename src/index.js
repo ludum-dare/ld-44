@@ -46,10 +46,12 @@ var character;
 var bounds;
 var cursors;
 var wasd;
-const numEnemiesStart = 10;
+const numEnemiesStart = 2;
 var combatKeys;
 var orbs;
-var justShot
+var justShot;
+var swinging;
+var bloodGroup;
 
 function preload() {
   this.load.image("logo", logoImg);
@@ -83,6 +85,8 @@ function create() {
   this.cameras.main.startFollow(character, true, 0.08, 0.08);
   this.cameras.main.setZoom(2);
 
+  bloodGroup = this.physics.add.group();
+
   const musicConf = { loop: true, delay: 0 }
   var music = this.sound.add("song_1", musicConf);
   music.play();
@@ -95,13 +99,16 @@ function create() {
   // Add the enemy
   initialEnemies = []
   for (var i = 0; i < numEnemiesStart; i++) {
-    var anEnemy = this.physics.add.sprite(i * 100, i * 50, 'enemy_1')
+    var anEnemy = this.physics.add.sprite(400 + (Math.random() * 75), 400 + (Math.random() * 75), 'enemy_1')
     anEnemy.tick = 0
+    anEnemy.health = 1;
     // initialEnemies.push(anEnemy)
     enemyGroup.add(anEnemy)
   }
   this.physics.add.collider(enemyGroup, enemyGroup, enemyCollision, null, this).name = 'enemyCollider'
   this.physics.add.collider(character, enemyGroup, characterCollision, null, this).name = 'characterCollider'
+  this.physics.add.collider(bloodGroup, bounds, orbWallCollisionCb);
+  this.physics.add.collider(bloodGroup, enemyGroup, bloodEnemyCollision);
   // enemy = this.physics.add.sprite(900, 1000, 'enemy_1')
   // enemy2 = this.physics.add.sprite(700, 400, 'enemy_1')
   // // enemy.setVelocityX(100)
@@ -117,6 +124,7 @@ function create() {
   this.physics.add.collider(enemyGroup, bounds)
 
   justShot = false;
+  swinging = false;
 }
 
 function enemyCollision(anEnemy, anotherEnemy) {
@@ -125,10 +133,24 @@ function enemyCollision(anEnemy, anotherEnemy) {
   console.log("Collision")
   return
 }
-function characterCollision() {
-  console.log("Character Collision")
-  return
+function characterCollision(character, enemy) {
+  if (swinging) {
+    enemy.health -= hud.swordLevel;
+    if (enemy.health <= 0)
+      enemy.destroy();
+  } else {
+    hud.updateHealth(-1);
+  }
 }
+
+function bloodEnemyCollision(blood, enemy) {
+  enemy.health -= hud.bloodLevel;
+  if (enemy.health <= 0)
+    enemy.destroy();
+
+  blood.destroy();
+}
+
 /**
  * Function that returns all the attributes about the map that you could possibly need
  */
@@ -254,7 +276,6 @@ function update() {
   //enemyMotion(enemy)
   //enemyMotion(enemy2)
   // this.physics.world.collide(enemy, enemy2, function() {
-
   // });
   // 
   // enemy2.depth =  enemy2.y + 1000;
@@ -262,17 +283,20 @@ function update() {
 
   const fOffset = hud.bloodLevel > 0 ? 2 : 0;
 
-  if (combatKeys.O.isDown)
+  if (combatKeys.O.isDown) {
     character.setFrame(1 + fOffset);
-  else
+    swinging = true;
+  } else {
     character.setFrame(0 + fOffset);
+    swinging = false;
+  }
 
   if (hud.bloodLevel > 0 && combatKeys.P.isDown && !justShot) {
     justShot = true;
 
     var sprite = new BloodOrb(scene, character.x, character.y, "blood_orb", 0);
     sprite.setActive(true);
-    this.physics.add.collider(sprite, bounds, orbWallCollisionCb);
+    bloodGroup.add(sprite);
 
     var x = 0;
     if (character.body.velocity.x > 0)
@@ -292,6 +316,18 @@ function update() {
     sprite.body.setVelocity(x, y);
   } else if (combatKeys.P.isUp) {
     justShot = false;
+  }
+
+  if (enemyGroup.countActive() === 0) {
+    hud.incrementWave();    
+    for (var i = 0; i < hud.currentWave * 2; i++) {
+      var anEnemy = this.physics.add.sprite(400 + (Math.random() * 75), 400 + (Math.random() * 75), 'enemy_1')
+      anEnemy.setActive(true);
+      anEnemy.tick = 0
+      anEnemy.health = hud.currentWave * 2;
+      // initialEnemies.push(anEnemy)
+      enemyGroup.add(anEnemy)
+    }
   }
 }
 

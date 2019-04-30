@@ -99,6 +99,9 @@ export default class Hud extends Phaser.Scene
 
         this.enableSwordUpgrade();
         this.enableBloodUpgrade();
+
+        this.currentHealth = this.maxHealth;
+        this.healthBar.displayWidth = this.healthDisplayWidth / 2;
     }
 
     resetWave()
