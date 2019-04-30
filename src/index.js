@@ -114,7 +114,6 @@ function create() {
   // this.cameras.main.scrollX = 800;
   // Add the enemy
   // 
-  tick = 0
   this.physics.add.collider(character, bounds)
   this.physics.add.collider(enemyGroup, bounds)
 
